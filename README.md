@@ -1,3 +1,4 @@
+
 # Clevis - Command Line Vector Graphics Software
 
 **Clevis** (Command Line Vector Graphics Software) is a Java-based vector graphics tool developed as a group project for the **COMP2021 Object-Oriented Programming** course at **PolyU**. It allows users to create, manipulate, and organize vector shapes through a command-line interface, demonstrating core OOP principles: Encapsulation, Inheritance, Polymorphism, and Abstraction.
@@ -14,7 +15,7 @@
 - [Key OOP Concepts](#key-oop-concepts)
 - [UML Diagram](#uml-diagram)
 - [Documentation](#documentation)
-- [Team Members](#team-members)
+- [Possible Improvements](#possible-improvements)
 - [Acknowledgments](#acknowledgments)
 
 ## ✨ Features
@@ -25,9 +26,11 @@
 | **Grouping** | `group`, `ungroup` | Organize multiple shapes into a single logical unit |
 | **Manipulation** | `move`, `delete` | Move or remove shapes/groups |
 | **Queries** | `boundingbox`, `shapeat`, `intersect` | Analyze shapes and spatial relationships |
-| **History** | `undo`, `redo` | Full undo/redo with Memento + Prototype patterns |
-| **System** | `list`, `listall`, `help`, `quit` | Display shapes, show help, and exit cleanly |
+| **History** | `undo`, `redo` | Full undo/redo by storing entire shape state snapshots in a stack (not inverse operations), supporting unlimited operations without stack overflow |
+| **System** | `list`, `listall`, `help`, `quit` | Display shapes, show all command syntaxes, and exit cleanly |
 | **Logging** | Automatic (HTML + TXT) | All operations are recorded to log files |
+
+> 💡 **About Undo/Redo**: Unlike command-based undo (which requires implementing inverse logic per command), Clevis stores complete snapshots of the shape system state in a stack. Each modification pushes a new state, and undo/redo simply moves between these snapshots. This approach supports arbitrarily many operations without overflow and simplifies adding new commands — no need to implement inverse operations.
 
 ## 🛠 Tech Stack
 
@@ -124,9 +127,9 @@ clevis>
 
 | Command | Syntax | Description |
 |---------|--------|-------------|
-| Undo | `undo` | Revert last modification |
-| Redo | `redo` | Reapply undone action |
-| Help | `help` | Show all commands |
+| Undo | `undo` | Revert last modification (state-stack based) |
+| Redo | `redo` | Reapply undone action (state-stack based) |
+| Help | `help` | Display all command syntaxes |
 | Quit | `quit` | Save logs and exit |
 
 ## 🧠 Key OOP Concepts
@@ -149,6 +152,14 @@ Refer to [`UML_ClassDiagram.pdf`](./UML_ClassDiagram.pdf) for the complete class
 - [User Manual](./user_manual.pdf) — Detailed command guide with examples
 - [Project Report](./project_report.pdf) — Architecture, design decisions, and reflections
 
+## 🔮 Possible Improvements
+
+| Area | Suggestion |
+|------|-------------|
+| **Graphical User Interface (GUI)** | Replace the current command-line interface with a graphical interface (e.g., JavaFX or Swing). Users could click to draw shapes, drag to move them, and see real-time visual feedback, making the tool more intuitive and accessible. |
+| **File Persistence** | Add save/load functionality to export/import canvas state as JSON or XML files. |
+| **Advanced Shapes** | Support more shapes like Ellipse, Polygon, and Bezier curves. |
+| **Performance** | Optimize undo/redo by using incremental state diffs instead of full snapshots for very large drawings. |
 
 ## 🙏 Acknowledgments
 
