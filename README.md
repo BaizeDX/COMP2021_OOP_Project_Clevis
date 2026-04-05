@@ -149,14 +149,6 @@ Refer to [`UML_ClassDiagram.pdf`](./UML_ClassDiagram.pdf) for the complete class
 - [User Manual](./user_manual.pdf) — Detailed command guide with examples
 - [Project Report](./project_report.pdf) — Architecture, design decisions, and reflections
 
-## 👥 Team Members
-
-| Name | Contribution |
-|------|--------------|
-| Meng Zihan | 25% |
-| Huang Junhao | 25% |
-| Luo Yeyushan | 25% |
-| He Liuying | 25% |
 
 ## 🙏 Acknowledgments
 
@@ -166,4 +158,3 @@ Refer to [`UML_ClassDiagram.pdf`](./UML_ClassDiagram.pdf) for the complete class
 ---
 
 **📌 Note**: This project was developed for educational purposes as part of the Object-Oriented Programming course.
-```
