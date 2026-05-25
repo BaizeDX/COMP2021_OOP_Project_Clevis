@@ -1,6 +1,6 @@
 package hk.edu.polyu.comp.comp2021.clevis;
 
-import hk.edu.polyu.comp.comp2021.clevis.model.Clevis;
+import hk.edu.polyu.comp.comp2021.clevis.controller.CommandProcessor;
 import hk.edu.polyu.comp.comp2021.clevis.Logger.CommandLogger;
 import hk.edu.polyu.comp.comp2021.clevis.model.Commander;
 import hk.edu.polyu.comp.comp2021.clevis.model.ShapeManager;
@@ -12,29 +12,27 @@ import java.util.Scanner;
  * and manages the main user input loop.
  */
 public class Application {
-    private Clevis clevis;
     private final CommandLogger logger;
-    private ShapeManager shapeManager;
-    private Commander commander;
+    private final CommandProcessor commandProcessor;
 
     /**
      * Initializes the Application with the necessary components and log file paths.
-     * Sets up the ShapeManager, Commander, Clevis controller, and the CommandLogger.
+     * Sets up the ShapeManager, Commander, CommandProcessor, and CommandLogger.
      *
      * @param htmlLogFile The file path where the HTML format log will be written.
      * @param txtLogFile  The file path where the plain text format log will be written.
      */
     public Application(String htmlLogFile, String txtLogFile) {
-        this.shapeManager = new ShapeManager();
-        this.commander = new Commander(shapeManager);
-        this.clevis = new Clevis(shapeManager, commander, htmlLogFile, txtLogFile);
+        ShapeManager shapeManager = new ShapeManager();
+        Commander commander = new Commander(shapeManager);
         this.logger = new CommandLogger(htmlLogFile, txtLogFile);
+        this.commandProcessor = new CommandProcessor(shapeManager, commander, logger);
     }
 
     /**
      * Starts the main execution loop of the application.
      * This method reads commands from the standard input (console), logs them,
-     * and delegates the processing to the Clevis controller.
+     * and delegates the processing to the shared command processor.
      * The loop continues until the user inputs the "quit" command.
      */
     public void run(){
@@ -46,7 +44,7 @@ public class Application {
             System.out.print("clevis> ");
             String rawCommand = scanner.nextLine().trim();
 
-            if(rawCommand.equals("quit")) {
+            if(rawCommand.equalsIgnoreCase("quit")) {
                 break;
             }
 
@@ -59,9 +57,7 @@ public class Application {
                 continue;
             }
 
-            logger.logCommand(rawCommand);
-
-            clevis.processCommand(rawCommand);
+            commandProcessor.processToConsole(rawCommand);
         }
 
         scanner.close();

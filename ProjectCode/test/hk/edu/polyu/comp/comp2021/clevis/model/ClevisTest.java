@@ -389,6 +389,27 @@ public class ClevisTest {
                 afterDelete.contains("r1") || afterDelete.contains("c1") || afterDelete.contains("g1"));
     }
 
+    /**
+     * Verifies that deleting a group releases its member names from the internal lock set.
+     * A deleted member should be gone, but its name should be reusable for a new shape.
+     */
+    @Test
+    public void testDeleteGroupReleasesMemberNames() {
+        String input = "rectangle r1 0 0 10 10\n" +
+                "group g1 r1\n" +
+                "delete g1\n" +
+                "rectangle r1 20 20 5 5\n" +
+                "list r1\n" +
+                "quit";
+        String output = runApplication(input);
+
+        assertFalse("Deleted group member name should not remain locked",
+                output.contains("already in Group"));
+        assertTrue("Name r1 should be reusable after deleting the group",
+                output.contains("Rectangle 'r1' created successfully.") &&
+                        output.contains("top-left = (20.00, 20.00)"));
+    }
+
     // ==========================================
     // Section 4: BoundingBox, Intersection, ShapeAt
     // ==========================================
@@ -421,6 +442,26 @@ public class ClevisTest {
         String output = runApplication(input);
         assertTrue("Group width should be 30.00", output.contains("width = 30.00"));
         assertTrue("Group height should be 30.00", output.contains("height = 30.00"));
+    }
+
+    /**
+     * Verifies that group bounding boxes are correct when all member coordinates are negative.
+     */
+    @Test
+    public void testGroupBoundingBoxWithAllNegativeCoordinates() {
+        String input = "rectangle r1 -20 -20 5 5\n" +
+                "square s1 -10 -10 2\n" +
+                "group g1 r1 s1\n" +
+                "boundingbox g1\n" +
+                "quit";
+        String output = runApplication(input);
+
+        assertTrue("Group top-left should use the most negative coordinates",
+                output.contains("top left = (-20.00, -20.00)"));
+        assertTrue("Group width should span from -20 to -8",
+                output.contains("width = 12.00"));
+        assertTrue("Group height should span from -20 to -8",
+                output.contains("height = 12.00"));
     }
 
     /**
@@ -865,6 +906,18 @@ public class ClevisTest {
 
         // Ensure the valid command was still processed despite previous empty inputs
         assertTrue("Should ignore empty lines and process valid command", output.contains("created successfully"));
+    }
+
+    /**
+     * Verifies that the CLI quit command is case-insensitive.
+     */
+    @Test
+    public void testQuitCommandCaseInsensitivity() {
+        String output = runApplication("qUiT\n");
+        assertTrue("Mixed-case quit should terminate the CLI cleanly",
+                output.contains("Clevis quit successfully."));
+        assertFalse("Mixed-case quit should not be processed as an unknown command",
+                output.contains("Unknown command"));
     }
 
     /**

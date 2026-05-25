@@ -152,6 +152,53 @@ public class ShapeManager {
     }
 
     /**
+     * Returns immutable shape descriptions in drawing order for read-only views.
+     * Groups are flattened so that their component shapes can be rendered.
+     *
+     * @return read-only snapshots of all visible shapes
+     */
+    public List<ShapeSnapshot> getShapeSnapshots() {
+        List<ShapeSnapshot> snapshots = new ArrayList<>();
+        for (String shapeName : WeightList) {
+            Shape shape = ShapesMap.get(shapeName);
+            if (shape != null) {
+                addShapeSnapshots(shape, snapshots);
+            }
+        }
+        return snapshots;
+    }
+
+    private void addShapeSnapshots(Shape shape, List<ShapeSnapshot> snapshots) {
+        if (shape instanceof Group) {
+            Group group = (Group) shape;
+            for (Shape element : group.getElements()) {
+                addShapeSnapshots(element, snapshots);
+            }
+            return;
+        }
+
+        if (shape instanceof Rectangle) {
+            Rectangle rectangle = (Rectangle) shape;
+            snapshots.add(ShapeSnapshot.bounded("Rectangle", rectangle.getName(),
+                    rectangle.getX(), rectangle.getY(), rectangle.getWidth(), rectangle.getHeight()));
+        } else if (shape instanceof Square) {
+            Square square = (Square) shape;
+            snapshots.add(ShapeSnapshot.bounded("Square", square.getName(),
+                    square.getX(), square.getY(), square.getSideLength(), square.getSideLength()));
+        } else if (shape instanceof Circle) {
+            Circle circle = (Circle) shape;
+            double diameter = circle.getRadius() * 2;
+            snapshots.add(ShapeSnapshot.bounded("Circle", circle.getName(),
+                    circle.getCenterX() - circle.getRadius(), circle.getCenterY() - circle.getRadius(),
+                    diameter, diameter));
+        } else if (shape instanceof Line) {
+            Line line = (Line) shape;
+            snapshots.add(ShapeSnapshot.line(line.getName(), line.getPositionX_1(), line.getPositionY_1(),
+                    line.getPositionX_2(), line.getPositionY_2()));
+        }
+    }
+
+    /**
      * Validates if a name is suitable for a new shape.
      * Checks for null, empty strings, and duplicate names.
      *
@@ -424,9 +471,25 @@ public class ShapeManager {
 
         saveState();
 
-        ShapesMap.remove(name);
+        Shape shape = ShapesMap.remove(name);
+        unlockGroupMembers(shape);
         WeightList.remove(name);
         System.out.println("clevis> Shape '" + name + "' deleted successfully.");
+    }
+
+    /**
+     * Releases all nested names held by a deleted group from the lock set.
+     */
+    private void unlockGroupMembers(Shape shape) {
+        if (!(shape instanceof Group)) {
+            return;
+        }
+
+        Group group = (Group) shape;
+        for (Shape element : group.getElements()) {
+            Locker.remove(element.getName());
+            unlockGroupMembers(element);
+        }
     }
 
     /**

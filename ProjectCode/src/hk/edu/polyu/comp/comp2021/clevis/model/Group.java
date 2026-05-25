@@ -50,10 +50,10 @@ public class Group extends Shape {
             return new double[]{0, 0, 0, 0};
         }
 
-        double minX = Double.MAX_VALUE;
-        double minY = Double.MAX_VALUE;
-        double maxX = Double.MIN_VALUE;
-        double maxY = Double.MIN_VALUE;
+        double minX = Double.POSITIVE_INFINITY;
+        double minY = Double.POSITIVE_INFINITY;
+        double maxX = Double.NEGATIVE_INFINITY;
+        double maxY = Double.NEGATIVE_INFINITY;
 
         for (Shape shape : elements) {
             double[] box = shape.getBoundingBox();
